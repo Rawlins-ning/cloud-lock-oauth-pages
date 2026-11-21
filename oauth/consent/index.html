@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>共享锁云端授权</title>
+  <style>
+    :root { font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; color:#172b43; background:#f3f6fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:1rem; }
+    main { width:min(100%, 460px); background:white; border:1px solid #dce4ee; border-radius:14px; padding:1.7rem; box-shadow:0 10px 36px #152d4514; }
+    h1 {font-size:1.45rem; line-height:1.3; margin:.15rem 0 1rem;}
+    p {margin:.6rem 0;color:#46546a;} label {display:block; margin:1rem 0 .4rem;font-weight:600;}
+    input {width:100%; padding:.72rem; border:1px solid #b8c6d5; border-radius:8px; font-size:1rem;}
+    button {width:100%;border-radius:8px;min-height:42px;padding:.65rem 1rem;cursor:pointer;font-weight:600;font-size:1rem;}
+    button.primary {background:#215aa0;color:white;border:1px solid #215aa0;}
+    button.secondary {background:white;color:#215aa0;border:1px solid #8ba7cb;}
+    button:disabled {cursor:not-allowed; opacity:.65;}
+    .actions {display:grid; grid-template-columns:1fr 1fr; gap:.7rem;margin-top:1rem;}
+    .actions button {width:100%;}
+    .detail {white-space:pre-wrap; overflow-wrap:anywhere; font-size:.93rem;color:#40516a;padding:.6rem;background:#f5f8fc;border-radius:6px;}
+    #message {font-size:.93rem; color:#8a2929; }
+    [hidden] {display:none!important;}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>云端共享锁授权</h1>
+    <p id="message" role="status" aria-live="polite">正在检查授权请求...</p>
+    <section id="login" hidden>
+      <p>请使用已获准访问该服务的 Supabase 账号登录。登录不代表自动批准第三方应用。</p>
+      <form id="login-form" autocomplete="on">
+        <label for="email">邮箱</label>
+        <input type="email" name="email" id="email" autocomplete="username" required/>
+        <label for="password">密码</label>
+        <input type="password" name="password" id="password" autocomplete="current-password" required/>
+        <button type="submit" class="primary" id="login-button" style="margin-top:1.2rem">登录并查看授权内容</button>
+      </form>
+    </section>
+    <section id="consent" hidden>
+      <p id="identity"></p>
+      <p>以下应用请求访问你的身份。请确认后再做决定。</p>
+      <label>请求应用</label><div id="client" class="detail"></div>
+      <label>请求权限</label><div id="scopes" class="detail"></div>
+      <label>授权返回地址</label><div id="redirect-uri" class="detail"></div>
+      <div class="actions">
+        <button type="button" class="secondary" id="deny">拒绝</button>
+        <button type="button" class="primary" id="approve">同意授权</button>
+      </div>
+      <p style="font-size:.85rem">此页面仅用于授权身份验证。正式飞书业务写入仍未启用。</p>
+    </section>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

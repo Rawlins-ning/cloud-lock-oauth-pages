@@ -1,0 +1,33 @@
+name: Validate OAuth Consent Page Build
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build with test-only public configuration
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_BUILD_TEST_ONLY
+          PUBLIC_BASE_PATH: /cloud-lock-oauth-pages/
+        run: |
+          set -euo pipefail
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run build
+          test -f dist/index.html
+          test -f dist/oauth/consent/index.html
+          test -n "$(find dist/assets -name '*.js' -print -quit)"
+          ! grep -r -E 'sb_secret_|SUPABASE_LOCK_TOKEN|service_role' dist
+          echo "STATIC BUILD AND PUBLIC-SOURCE CHECK: PASS"

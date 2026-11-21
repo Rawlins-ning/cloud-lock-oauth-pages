@@ -1,0 +1,48 @@
+name: Deploy OAuth Consent UI to GitHub Pages
+on:
+  # Manual-only until the Pages source and publishable key are configured.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build consent UI (public config only)
+        env:
+          VITE_SUPABASE_URL: https://lkxfrgwexupacwmpczgc.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          PUBLIC_BASE_PATH: /cloud-lock-oauth-pages/
+        run: |
+          set -euo pipefail
+          : "${VITE_SUPABASE_PUBLISHABLE_KEY:?Missing GitHub repo secret SUPABASE_PUBLISHABLE_KEY}"
+          npm install --ignore-scripts --no-audit --no-fund
+          npm run build
+          test -f dist/index.html
+          test -f dist/oauth/consent/index.html
+          touch dist/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
