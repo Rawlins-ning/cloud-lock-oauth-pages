@@ -22,6 +22,6 @@
 
 使用 Node 22+；`npm install` 与 `npm run build` 生成静态文件。由 Vite 将 `VITE_SUPABASE_URL` 和 `VITE_SUPABASE_PUBLISHABLE_KEY` 编入公开 JavaScript 产物。
 
-本仓库 GitHub Actions 工作流**目前仅手动触发**，防止在 Pages 和公钥配置前反复失败。完成首次成功部署后可以启用 `main` 分支的 push 自动部署。
+本仓库 GitHub Actions 工作流现支持 **main 分支代码提交自动部署**及手工触发。构建、上传和发布分成两个作业；上传文件包按运行 ID/尝试次数单独命名，避免因重新运行相同任务出现重名冲突。首次部署仍需在 Settings → Pages 中选择 GitHub Actions，并配置 SUPABASE_PUBLISHABLE_KEY。
 
 安全提醒：公开网页的登录表单直接通过 `@supabase/supabase-js` 与 Supabase Auth 通信，密码不发送到我们的 GitHub Actions 或共享锁服务。以后其他成员仍需各自独立授权。
