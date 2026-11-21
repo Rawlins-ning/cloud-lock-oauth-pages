@@ -1,0 +1,20 @@
+{
+  "name": "supabase-oauth-consent-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Static user-consent UI for Supabase OAuth server; does not hold private credentials",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.119.2"
+  },
+  "devDependencies": {
+    "vite": "8.3.8"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
