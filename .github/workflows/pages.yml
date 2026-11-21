@@ -1,24 +1,23 @@
 name: Deploy OAuth Consent UI to GitHub Pages
 on:
-  # Manual-only until the Pages source and publishable key are configured.
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,7 +32,7 @@ jobs:
           PUBLIC_BASE_PATH: /cloud-lock-oauth-pages/
         run: |
           set -euo pipefail
-          : "${VITE_SUPABASE_PUBLISHABLE_KEY:?Missing GitHub repo secret SUPABASE_PUBLISHABLE_KEY}"
+          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || { echo 'Missing SUPABASE_PUBLISHABLE_KEY'; exit 1; }
           npm install --ignore-scripts --no-audit --no-fund
           npm run build
           test -f dist/index.html
@@ -42,7 +41,19 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
